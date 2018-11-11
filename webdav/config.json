@@ -1,0 +1,23 @@
+{
+  "name": "WebDav",
+  "version": "1",
+  "slug": "webdav",
+  "description": "Access Hass.io data over WebDav",
+  "url": "https://home-assistant.io/addons/webdav/",
+  "startup": "service",
+  "boot": "auto",
+  "ports": {
+    "80/tcp": 8880,
+    "443/tcp": 8443
+   },
+  "map": ["ssl", "share", "config", "backup"],
+  "options": {
+    "certfile": "fullchain.pem",
+    "keyfile": "privkey.pem"
+  },
+  "schema": {
+    "certfile": "str",
+    "keyfile": "str"
+  },
+  "image": "homeassistant/{arch}-addon-webdav"
+}
