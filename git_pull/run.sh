@@ -176,33 +176,29 @@ function validate-config {
     NEW_COMMIT=$(git rev-parse HEAD)
     if [ "$NEW_COMMIT" != "$OLD_COMMIT" ]; then
         echo "[Info] Something has changed, checking Home-Assistant config..."
-        if hassio homeassistant check; then
-            if [ "$AUTO_RESTART" == "true" ]; then
-                DO_RESTART="false"
-                CHANGED_FILES=$(git diff "$OLD_COMMIT" "$NEW_COMMIT" --name-only)
-                echo "Changed Files: $CHANGED_FILES"
-                if [ -n "$RESTART_IGNORED_FILES" ]; then
-                    for file in $CHANGED_FILES; do
-                        echo "$RESTART_IGNORED_FILES" | grep -qw "${file}"
-                        if [ $? -eq 1 ] ; then
-                            DO_RESTART="true"
-                            echo "[Info] Detected Restart Required File $file"
-                        fi
-                    done
-                else
-                    DO_RESTART="true"
-                fi
-                if [ "$DO_RESTART" == "true" ]; then
-                    echo "[Info] Restart Home-Assistant"
-                    hassio homeassistant restart 2&> /dev/null
-                else
-                    echo "[Info] No Restart Required, only ignored changes detected"
-                fi
+        if [ "$AUTO_RESTART" == "true" ]; then
+            DO_RESTART="false"
+            CHANGED_FILES=$(git diff "$OLD_COMMIT" "$NEW_COMMIT" --name-only)
+            echo "Changed Files: $CHANGED_FILES"
+            if [ -n "$RESTART_IGNORED_FILES" ]; then
+                for file in $CHANGED_FILES; do
+                    echo "$RESTART_IGNORED_FILES" | grep -qw "${file}"
+                    if [ $? -eq 1 ] ; then
+                        DO_RESTART="true"
+                        echo "[Info] Detected Restart Required File $file"
+                    fi
+                done
             else
-                echo "[Info] Local configuration has changed. Restart required."
+                DO_RESTART="true"
+            fi
+            if [ "$DO_RESTART" == "true" ]; then
+                echo "[Info] Restart Home-Assistant"
+                hassio homeassistant restart 2&> /dev/null
+            else
+                echo "[Info] No Restart Required, only ignored changes detected"
             fi
         else
-            echo "[Error] Configuration updated but it does not pass the config check. Do not restart until this is fixed!"
+            echo "[Info] Local configuration has changed. Restart required."
         fi
     else
         echo "[Info] Nothing has changed."
