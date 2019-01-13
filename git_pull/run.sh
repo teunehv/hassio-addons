@@ -214,6 +214,7 @@ while true; do
     check-ssh-key
     setup-user-password
     git-synchronize
+    cp /config/prd_secrets.yaml /config/secrets.yaml
     validate-config
      # do we repeat?
     if [ ! "$REPEAT_ACTIVE" == "true" ]; then
